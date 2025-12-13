@@ -6,7 +6,7 @@
 namespace MemoryTrainer {
 
 MemoryGame::MemoryGame(GameType type, Difficulty difficulty)
-    : type_(type), difficulty_(difficulty), rng_(std::chrono::steady_clock::now().time_since_epoch().count()) {
+    : type_(type), difficulty_(difficulty), rng_(::std::chrono::steady_clock::now().time_since_epoch().count()) {
 }
 
 int MemoryGame::getMemorizationTime() const {
@@ -48,7 +48,7 @@ int MemoryGame::getNumberRange() const {
     }
 }
 
-// SequenceGame implementation
+
 SequenceGame::SequenceGame(Difficulty difficulty)
     : MemoryGame(GameType::SEQUENCE, difficulty) {
 }
@@ -57,14 +57,14 @@ void SequenceGame::generate() {
     sequence_.clear();
     sequence_.reserve(getSequenceLength());
     
-    std::uniform_int_distribution<int> dist(1, getNumberRange());
+    ::std::uniform_int_distribution<int> dist(1, getNumberRange());
     
     for (int i = 0; i < getSequenceLength(); ++i) {
         sequence_.push_back(dist(rng_));
     }
 }
 
-GameResult SequenceGame::checkAnswer(const std::vector<int>& answer) {
+GameResult SequenceGame::checkAnswer(const ::std::vector<int>& answer) {
     GameResult result;
     result.success = (answer == sequence_);
     
@@ -79,11 +79,11 @@ GameResult SequenceGame::checkAnswer(const std::vector<int>& answer) {
     return result;
 }
 
-std::vector<int> SequenceGame::getSequence() const {
+::std::vector<int> SequenceGame::getSequence() const {
     return sequence_;
 }
 
-// PairsGame implementation
+
 PairsGame::PairsGame(Difficulty difficulty)
     : MemoryGame(GameType::PAIRS, difficulty) {
 }
@@ -93,7 +93,7 @@ void PairsGame::generate() {
     sequence_.clear();
     
     int pairCount = getSequenceLength() / 2;
-    std::uniform_int_distribution<int> dist(1, getNumberRange());
+    ::std::uniform_int_distribution<int> dist(1, getNumberRange());
     
     for (int i = 0; i < pairCount; ++i) {
         int value = dist(rng_);
@@ -105,10 +105,10 @@ void PairsGame::generate() {
         sequence_.push_back(pair.second);
     }
     
-    std::shuffle(sequence_.begin(), sequence_.end(), rng_);
+    ::std::shuffle(sequence_.begin(), sequence_.end(), rng_);
 }
 
-GameResult PairsGame::checkAnswer(const std::vector<int>& answer) {
+GameResult PairsGame::checkAnswer(const ::std::vector<int>& answer) {
     GameResult result;
     
     if (answer.size() != sequence_.size()) {
@@ -141,11 +141,11 @@ GameResult PairsGame::checkAnswer(const std::vector<int>& answer) {
     return result;
 }
 
-std::vector<int> PairsGame::getSequence() const {
+::std::vector<int> PairsGame::getSequence() const {
     return sequence_;
 }
 
-std::vector<std::pair<int, int>> PairsGame::getPairs() const {
+::std::vector<::std::pair<int, int>> PairsGame::getPairs() const {
     return pairs_;
 }
 

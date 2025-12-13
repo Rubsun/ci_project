@@ -126,6 +126,17 @@ header h1 {
     color: #000;
 }
 
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #333;
+    font-weight: 500;
+}
+
 .modal-content input {
     width: 100%;
     padding: 12px;
@@ -133,6 +144,7 @@ header h1 {
     border: 2px solid #e0e0e0;
     border-radius: 8px;
     font-size: 16px;
+    box-sizing: border-box;
 }
 
 .modal-content input:focus {

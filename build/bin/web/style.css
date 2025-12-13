@@ -14,7 +14,6 @@ body {
     padding: 20px;
 }
 
-/* Навигация */
 .navbar {
     position: fixed;
     top: 0;
@@ -67,7 +66,6 @@ body {
     font-size: 14px;
 }
 
-/* Контейнер */
 .container {
     background: white;
     border-radius: 20px;
@@ -94,7 +92,6 @@ header h1 {
     font-size: 1.1em;
 }
 
-/* Модальное окно авторизации */
 .auth-modal {
     display: none;
     position: fixed;
@@ -129,6 +126,17 @@ header h1 {
     color: #000;
 }
 
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #333;
+    font-weight: 500;
+}
+
 .modal-content input {
     width: 100%;
     padding: 12px;
@@ -136,6 +144,7 @@ header h1 {
     border: 2px solid #e0e0e0;
     border-radius: 8px;
     font-size: 16px;
+    box-sizing: border-box;
 }
 
 .modal-content input:focus {
@@ -148,7 +157,6 @@ header h1 {
     text-decoration: none;
 }
 
-/* Настройка игры */
 .game-setup {
     text-align: center;
 }
@@ -259,7 +267,6 @@ select:focus {
     color: #667eea;
 }
 
-/* Игра в последовательность */
 .memorization-phase,
 .answer-phase {
     text-align: center;
@@ -382,7 +389,6 @@ select:focus {
     flex-wrap: wrap;
 }
 
-/* Карточная игра */
 .cards-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -447,7 +453,6 @@ select:focus {
     border-color: #28a745;
 }
 
-/* Результаты */
 .result-message {
     margin-top: 30px;
     padding: 20px;
@@ -472,7 +477,6 @@ select:focus {
     display: block;
 }
 
-/* Таблица лидеров */
 .leaderboard {
     margin-top: 30px;
 }
@@ -518,7 +522,6 @@ select:focus {
     color: #666;
 }
 
-/* Адаптивность */
 @media (max-width: 768px) {
     .container {
         padding: 20px;

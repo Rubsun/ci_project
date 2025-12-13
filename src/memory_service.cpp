@@ -11,21 +11,21 @@ namespace MemoryTrainer {
 MemoryService::MemoryService() {
 }
 
-std::string MemoryService::createGame(GameType type, Difficulty difficulty) {
-    std::lock_guard<std::mutex> lock(gamesMutex_);
+::std::string MemoryService::createGame(GameType type, Difficulty difficulty) {
+    ::std::lock_guard<::std::mutex> lock(gamesMutex_);
     
-    std::string gameId = generateGameId();
+    ::std::string gameId = generateGameId();
     
-    std::shared_ptr<MemoryGame> game;
+    ::std::shared_ptr<MemoryGame> game;
     switch (type) {
         case GameType::SEQUENCE:
-            game = std::make_shared<SequenceGame>(difficulty);
+            game = ::std::make_shared<SequenceGame>(difficulty);
             break;
         case GameType::PAIRS:
-            game = std::make_shared<CardPairsGame>(difficulty);
+            game = ::std::make_shared<CardPairsGame>(difficulty);
             break;
         case GameType::NUMBERS:
-            game = std::make_shared<SequenceGame>(difficulty);
+            game = ::std::make_shared<SequenceGame>(difficulty);
             break;
     }
     
@@ -35,8 +35,8 @@ std::string MemoryService::createGame(GameType type, Difficulty difficulty) {
     return gameId;
 }
 
-std::shared_ptr<MemoryGame> MemoryService::getGame(const std::string& gameId) {
-    std::lock_guard<std::mutex> lock(gamesMutex_);
+::std::shared_ptr<MemoryGame> MemoryService::getGame(const ::std::string& gameId) {
+    ::std::lock_guard<::std::mutex> lock(gamesMutex_);
     
     auto it = games_.find(gameId);
     if (it != games_.end()) {
@@ -45,26 +45,26 @@ std::shared_ptr<MemoryGame> MemoryService::getGame(const std::string& gameId) {
     return nullptr;
 }
 
-void MemoryService::removeGame(const std::string& gameId) {
-    std::lock_guard<std::mutex> lock(gamesMutex_);
+void MemoryService::removeGame(const ::std::string& gameId) {
+    ::std::lock_guard<::std::mutex> lock(gamesMutex_);
     games_.erase(gameId);
 }
 
 void MemoryService::cleanup() {
-    std::lock_guard<std::mutex> lock(gamesMutex_);
+    ::std::lock_guard<::std::mutex> lock(gamesMutex_);
     games_.clear();
 }
 
-std::string MemoryService::generateGameId() {
-    auto now = std::chrono::system_clock::now();
-    auto time = std::chrono::duration_cast<std::chrono::milliseconds>(
+::std::string MemoryService::generateGameId() {
+    auto now = ::std::chrono::system_clock::now();
+    auto time = ::std::chrono::duration_cast<::std::chrono::milliseconds>(
         now.time_since_epoch()).count();
     
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<> dis(1000, 9999);
+    ::std::random_device rd;
+    ::std::mt19937 gen(rd());
+    ::std::uniform_int_distribution<> dis(1000, 9999);
     
-    std::ostringstream oss;
+    ::std::ostringstream oss;
     oss << time << "_" << dis(gen);
     return oss.str();
 }

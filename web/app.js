@@ -9,6 +9,7 @@ let gameTimer = null;
 let startTime = null;
 let flippedCards = [];
 let checkPairTimeout = null;
+let sessionId = localStorage.getItem('sessionId') || '';
 
 async function startGame() {
     console.log('startGame called');
@@ -175,7 +176,7 @@ async function checkCardPair(cardId1, cardId2) {
         const response = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ cardId1, cardId2 })
+            body: JSON.stringify({ cardId1, cardId2, sessionId })
         });
         
         const data = await response.json();
@@ -196,6 +197,10 @@ async function checkCardPair(cardId1, cardId2) {
         
         if (data.isComplete === 'true' || data.isComplete === true) {
             showResult(true, data.message, parseInt(data.score || 0));
+            if (sessionId) {
+                // Обновляем информацию о пользователе после победы
+                setTimeout(() => updateUserInfo(), 500);
+            }
         }
         
     } catch (error) {
@@ -310,7 +315,7 @@ async function checkAnswer() {
         const response = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ answer: currentAnswer })
+            body: JSON.stringify({ answer: currentAnswer, sessionId })
         });
         
         const data = await response.json();
@@ -327,6 +332,9 @@ async function checkAnswer() {
         }
         
         clearInterval(gameTimer);
+        if (sessionId) {
+            updateUserInfo();
+        }
     } catch (error) {
         console.error('Error:', error);
         alert('Ошибка при проверке ответа');
@@ -407,8 +415,170 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
+    // Обработчики авторизации
+    const registerBtn = document.getElementById('registerBtn');
+    const loginBtn = document.getElementById('loginBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const registerModal = document.getElementById('registerModal');
+    const loginModal = document.getElementById('loginModal');
+    const closeRegister = document.getElementById('closeRegister');
+    const closeLogin = document.getElementById('closeLogin');
+    const registerForm = document.getElementById('registerForm');
+    const loginForm = document.getElementById('loginForm');
+
+    if (registerBtn) {
+        registerBtn.addEventListener('click', () => {
+            registerModal.style.display = 'block';
+        });
+    }
+
+    if (loginBtn) {
+        loginBtn.addEventListener('click', () => {
+            loginModal.style.display = 'block';
+        });
+    }
+
+    if (closeRegister) {
+        closeRegister.addEventListener('click', () => {
+            registerModal.style.display = 'none';
+        });
+    }
+
+    if (closeLogin) {
+        closeLogin.addEventListener('click', () => {
+            loginModal.style.display = 'none';
+        });
+    }
+
+    if (registerForm) {
+        registerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('registerUsername').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            await registerUser(username, email, password);
+        });
+    }
+
+    if (loginForm) {
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+            await loginUser(username, password);
+        });
+    }
+
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', async () => {
+            await logoutUser();
+        });
+    }
+
+    // Проверяем, есть ли активная сессия
+    if (sessionId) {
+        updateUserInfo();
+    }
+
     console.log('All event handlers attached');
 });
+
+// Функции авторизации
+async function registerUser(username, email, password) {
+    try {
+        const response = await fetch('/api/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, email, password })
+        });
+        const data = await response.json();
+        if (data.success) {
+            alert('Регистрация успешна! Теперь войдите.');
+            document.getElementById('registerModal').style.display = 'none';
+            document.getElementById('registerForm').reset();
+        } else {
+            alert('Ошибка: ' + (data.error || 'Неизвестная ошибка'));
+        }
+    } catch (error) {
+        console.error('Registration error:', error);
+        alert('Ошибка при регистрации');
+    }
+}
+
+async function loginUser(username, password) {
+    try {
+        const response = await fetch('/api/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+        });
+        const data = await response.json();
+        if ((data.success === true || data.success === "true") && data.sessionId) {
+            sessionId = data.sessionId;
+            localStorage.setItem('sessionId', sessionId);
+            document.getElementById('loginModal').style.display = 'none';
+            document.getElementById('loginForm').reset();
+            await updateUserInfo();
+        } else {
+            alert('Ошибка: ' + (data.error || 'Неверный логин или пароль'));
+        }
+    } catch (error) {
+        console.error('Login error:', error);
+        alert('Ошибка при входе');
+    }
+}
+
+async function logoutUser() {
+    try {
+        if (sessionId) {
+            await fetch('/api/logout', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ sessionId })
+            });
+        }
+        sessionId = '';
+        localStorage.removeItem('sessionId');
+        updateUserInfo();
+    } catch (error) {
+        console.error('Logout error:', error);
+    }
+}
+
+async function updateUserInfo() {
+    const authButtons = document.getElementById('authButtons');
+    const userInfo = document.getElementById('userInfo');
+    const userInfoText = document.getElementById('userInfoText');
+
+    if (sessionId) {
+        try {
+            const response = await fetch(`/api/user?sessionId=${sessionId}`);
+            const data = await response.json();
+            // Проверяем, есть ли данные пользователя (может быть data.user или данные напрямую)
+            const userData = data.user || data;
+            if (userData && userData.username) {
+                if (authButtons) authButtons.style.display = 'none';
+                if (userInfo) userInfo.style.display = 'flex';
+                if (userInfoText) {
+                    userInfoText.textContent = `${userData.username} (Очки: ${userData.totalScore || 0})`;
+                }
+            } else {
+                // Сессия недействительна
+                sessionId = '';
+                localStorage.removeItem('sessionId');
+                if (authButtons) authButtons.style.display = 'flex';
+                if (userInfo) userInfo.style.display = 'none';
+            }
+        } catch (error) {
+            console.error('Error fetching user info:', error);
+            if (authButtons) authButtons.style.display = 'flex';
+            if (userInfo) userInfo.style.display = 'none';
+        }
+    } else {
+        if (authButtons) authButtons.style.display = 'flex';
+        if (userInfo) userInfo.style.display = 'none';
+    }
+}
 
 window.startGame = startGame;
 window.resetGame = resetGame;

@@ -7,13 +7,13 @@
 #include <regex>
 
 namespace SimpleJson {
-    std::string object(const std::vector<std::pair<std::string, std::string>>& fields) {
-        std::ostringstream oss;
+    ::std::string object(const ::std::vector<::std::pair<::std::string, ::std::string>>& fields) {
+        ::std::ostringstream oss;
         oss << "{";
         for (size_t i = 0; i < fields.size(); ++i) {
             if (i > 0) oss << ",";
             oss << "\"" << fields[i].first << "\":";
-            std::string value = fields[i].second;
+            ::std::string value = fields[i].second;
             
             if (!value.empty() && (value[0] == '{' || value[0] == '[')) {
                 oss << value;
@@ -36,8 +36,8 @@ namespace SimpleJson {
         return oss.str();
     }
     
-    std::string array(const std::vector<int>& values) {
-        std::ostringstream oss;
+    ::std::string array(const ::std::vector<int>& values) {
+        ::std::ostringstream oss;
         oss << "[";
         for (size_t i = 0; i < values.size(); ++i) {
             oss << values[i];
@@ -47,8 +47,8 @@ namespace SimpleJson {
         return oss.str();
     }
     
-    std::string escape(const std::string& str) {
-        std::ostringstream oss;
+    ::std::string escape(const ::std::string& str) {
+        ::std::ostringstream oss;
         for (char c : str) {
             if (c == '"') oss << "\\\"";
             else if (c == '\\') oss << "\\\\";
@@ -65,7 +65,7 @@ ApiController::ApiController(MemoryService& service, UserService& userService)
     : service_(service), userService_(userService) {
 }
 
-std::string ApiController::handleCreateGame(const std::string& type, const std::string& difficulty, const std::string& sessionId) {
+::std::string ApiController::handleCreateGame(const ::std::string& type, const ::std::string& difficulty, const ::std::string& sessionId) {
     GameType gameType = GameType::SEQUENCE;
     if (type == "pairs" || type == "cards") gameType = GameType::PAIRS;
     else if (type == "numbers") gameType = GameType::NUMBERS;
@@ -74,7 +74,7 @@ std::string ApiController::handleCreateGame(const std::string& type, const std::
     if (difficulty == "easy") diff = Difficulty::EASY;
     else if (difficulty == "hard") diff = Difficulty::HARD;
     
-    std::string gameId = service_.createGame(gameType, diff);
+    ::std::string gameId = service_.createGame(gameType, diff);
     auto game = service_.getGame(gameId);
     
     if (!game) {
@@ -84,10 +84,10 @@ std::string ApiController::handleCreateGame(const std::string& type, const std::
     }
     
     if (gameType == GameType::PAIRS) {
-        auto cardGame = std::dynamic_pointer_cast<CardPairsGame>(game);
+        auto cardGame = ::std::dynamic_pointer_cast<CardPairsGame>(game);
         if (cardGame) {
             auto cards = cardGame->getCards();
-            std::ostringstream cardsJson;
+            ::std::ostringstream cardsJson;
             cardsJson << "[";
             for (size_t i = 0; i < cards.size(); ++i) {
                 if (i > 0) cardsJson << ",";
@@ -100,14 +100,14 @@ std::string ApiController::handleCreateGame(const std::string& type, const std::
             }
             cardsJson << "]";
             
-            std::string cardsJsonStr = cardsJson.str();
+            ::std::string cardsJsonStr = cardsJson.str();
             
             return SimpleJson::object({
                 {"gameId", gameId},
                 {"type", "cards"},
                 {"difficulty", difficulty},
                 {"cards", cardsJsonStr},
-                {"totalPairs", std::to_string(static_cast<int>(cards.size()) / 2)}
+                {"totalPairs", ::std::to_string(static_cast<int>(cards.size()) / 2)}
             });
         }
     }
@@ -119,11 +119,11 @@ std::string ApiController::handleCreateGame(const std::string& type, const std::
         {"type", type},
         {"difficulty", difficulty},
         {"sequence", SimpleJson::array(sequence)},
-        {"memorizationTime", std::to_string(game->getMemorizationTime())}
+        {"memorizationTime", ::std::to_string(game->getMemorizationTime())}
     });
 }
 
-std::string ApiController::handleGetGame(const std::string& gameId) {
+::std::string ApiController::handleGetGame(const ::std::string& gameId) {
     auto game = service_.getGame(gameId);
     
     if (!game) {
@@ -132,19 +132,19 @@ std::string ApiController::handleGetGame(const std::string& gameId) {
         });
     }
     
-    std::string typeStr = "sequence";
+    ::std::string typeStr = "sequence";
     if (game->getType() == GameType::PAIRS) typeStr = "cards";
     else if (game->getType() == GameType::NUMBERS) typeStr = "numbers";
     
-    std::string diffStr = "medium";
+    ::std::string diffStr = "medium";
     if (game->getDifficulty() == Difficulty::EASY) diffStr = "easy";
     else if (game->getDifficulty() == Difficulty::HARD) diffStr = "hard";
     
     if (game->getType() == GameType::PAIRS) {
-        auto cardGame = std::dynamic_pointer_cast<CardPairsGame>(game);
+        auto cardGame = ::std::dynamic_pointer_cast<CardPairsGame>(game);
         if (cardGame) {
             auto cards = cardGame->getCards();
-            std::ostringstream cardsJson;
+            ::std::ostringstream cardsJson;
             cardsJson << "[";
             for (size_t i = 0; i < cards.size(); ++i) {
                 if (i > 0) cardsJson << ",";
@@ -162,8 +162,8 @@ std::string ApiController::handleGetGame(const std::string& gameId) {
                 {"type", "cards"},
                 {"difficulty", diffStr},
                 {"cards", cardsJson.str()},
-                {"moves", std::to_string(cardGame->getMovesCount())},
-                {"pairsFound", std::to_string(cardGame->getPairsFound())},
+                {"moves", ::std::to_string(cardGame->getMovesCount())},
+                {"pairsFound", ::std::to_string(cardGame->getPairsFound())},
                 {"isComplete", cardGame->isGameComplete() ? "true" : "false"}
             });
         }
@@ -176,11 +176,11 @@ std::string ApiController::handleGetGame(const std::string& gameId) {
         {"type", typeStr},
         {"difficulty", diffStr},
         {"sequence", SimpleJson::array(sequence)},
-        {"memorizationTime", std::to_string(game->getMemorizationTime())}
+        {"memorizationTime", ::std::to_string(game->getMemorizationTime())}
     });
 }
 
-std::string ApiController::handleCheckAnswer(const std::string& gameId, const std::vector<int>& answer, const std::string& sessionId) {
+::std::string ApiController::handleCheckAnswer(const ::std::string& gameId, const ::std::vector<int>& answer, const ::std::string& sessionId) {
     auto game = service_.getGame(gameId);
     
     if (!game) {
@@ -200,12 +200,12 @@ std::string ApiController::handleCheckAnswer(const std::string& gameId, const st
     
     return SimpleJson::object({
         {"success", result.success ? "true" : "false"},
-        {"score", std::to_string(result.score)},
+        {"score", ::std::to_string(result.score)},
         {"message", result.message}
     });
 }
 
-std::string ApiController::handleFlipCard(const std::string& gameId, int cardId) {
+::std::string ApiController::handleFlipCard(const ::std::string& gameId, int cardId) {
     auto game = service_.getGame(gameId);
     
     if (!game || game->getType() != GameType::PAIRS) {
@@ -214,7 +214,7 @@ std::string ApiController::handleFlipCard(const std::string& gameId, int cardId)
         });
     }
     
-    auto cardGame = std::dynamic_pointer_cast<CardPairsGame>(game);
+    auto cardGame = ::std::dynamic_pointer_cast<CardPairsGame>(game);
     if (!cardGame) {
         return SimpleJson::object({
             {"error", "Invalid game type"}
@@ -231,7 +231,7 @@ std::string ApiController::handleFlipCard(const std::string& gameId, int cardId)
     auto cards = cardGame->getCards();
     auto flippedPair = cardGame->getFlippedCards();
     
-    std::ostringstream cardsJson;
+    ::std::ostringstream cardsJson;
     cardsJson << "[";
     for (size_t i = 0; i < cards.size(); ++i) {
         cardsJson << "{";
@@ -244,7 +244,7 @@ std::string ApiController::handleFlipCard(const std::string& gameId, int cardId)
     }
     cardsJson << "]";
     
-    std::ostringstream flippedJson;
+    ::std::ostringstream flippedJson;
     flippedJson << "[";
     if (flippedPair.first >= 0) {
         flippedJson << flippedPair.first;
@@ -258,13 +258,13 @@ std::string ApiController::handleFlipCard(const std::string& gameId, int cardId)
         {"success", "true"},
         {"cards", cardsJson.str()},
         {"flippedCards", flippedJson.str()},
-        {"moves", std::to_string(cardGame->getMovesCount())},
-        {"pairsFound", std::to_string(cardGame->getPairsFound())},
+        {"moves", ::std::to_string(cardGame->getMovesCount())},
+        {"pairsFound", ::std::to_string(cardGame->getPairsFound())},
         {"isComplete", cardGame->isGameComplete() ? "true" : "false"}
     });
 }
 
-std::string ApiController::handleCheckCardPair(const std::string& gameId, int cardId1, int cardId2, const std::string& sessionId) {
+::std::string ApiController::handleCheckCardPair(const ::std::string& gameId, int cardId1, int cardId2, const ::std::string& sessionId) {
     auto game = service_.getGame(gameId);
     
     if (!game || game->getType() != GameType::PAIRS) {
@@ -273,7 +273,7 @@ std::string ApiController::handleCheckCardPair(const std::string& gameId, int ca
         });
     }
     
-    auto cardGame = std::dynamic_pointer_cast<CardPairsGame>(game);
+    auto cardGame = ::std::dynamic_pointer_cast<CardPairsGame>(game);
     if (!cardGame) {
         return SimpleJson::object({
             {"error", "Invalid game type"}
@@ -287,7 +287,7 @@ std::string ApiController::handleCheckCardPair(const std::string& gameId, int ca
     }
 
     auto cards = cardGame->getCards();
-    std::ostringstream cardsJson;
+    ::std::ostringstream cardsJson;
     cardsJson << "[";
     for (size_t i = 0; i < cards.size(); ++i) {
         if (i > 0) cardsJson << ",";
@@ -300,7 +300,7 @@ std::string ApiController::handleCheckCardPair(const std::string& gameId, int ca
     }
     cardsJson << "]";
     
-    std::string flippedJson = "[]";
+    ::std::string flippedJson = "[]";
     
     bool gameComplete = cardGame->isGameComplete();
     int score = 0;
@@ -321,22 +321,22 @@ std::string ApiController::handleCheckCardPair(const std::string& gameId, int ca
         {"isPair", isPair ? "true" : "false"},
         {"cards", cardsJson.str()},
         {"flippedCards", flippedJson},
-        {"moves", std::to_string(cardGame->getMovesCount())},
-        {"pairsFound", std::to_string(cardGame->getPairsFound())},
+        {"moves", ::std::to_string(cardGame->getMovesCount())},
+        {"pairsFound", ::std::to_string(cardGame->getPairsFound())},
         {"isComplete", gameComplete ? "true" : "false"},
-        {"score", std::to_string(score)},
+        {"score", ::std::to_string(score)},
         {"message", gameComplete ? "Поздравляем! Все пары найдены!" : (isPair ? "Пара найдена!" : "Не пара, попробуйте еще раз")}
     });
 }
 
-std::string ApiController::handleRegister(const std::string& username, const std::string& email, const std::string& password) {
+::std::string ApiController::handleRegister(const ::std::string& username, const ::std::string& email, const ::std::string& password) {
     if (username.empty() || email.empty() || password.empty()) {
         return SimpleJson::object({
             {"error", "All fields are required"}
         });
     }
     
-    std::string userId = userService_.registerUser(username, email, password);
+    ::std::string userId = userService_.registerUser(username, email, password);
     
     if (userId.empty()) {
         return SimpleJson::object({
@@ -351,59 +351,70 @@ std::string ApiController::handleRegister(const std::string& username, const std
     });
 }
 
-std::string ApiController::handleLogin(const std::string& username, const std::string& password) {
-    std::string sessionId = userService_.loginUser(username, password);
+::std::string ApiController::handleLogin(const ::std::string& username, const ::std::string& password) {
+    ::std::string sessionId = userService_.loginUser(username, password);
     
     if (sessionId.empty()) {
         return SimpleJson::object({
+            {"success", "false"},
             {"error", "Invalid username or password"}
         });
     }
     
     auto user = userService_.getUserBySession(sessionId);
+    if (!user) {
+        return SimpleJson::object({
+            {"success", "false"},
+            {"error", "Failed to get user data"}
+        });
+    }
     
     return SimpleJson::object({
         {"success", "true"},
         {"sessionId", sessionId},
         {"username", user->username},
-        {"totalScore", std::to_string(user->totalScore)},
-        {"gamesPlayed", std::to_string(user->gamesPlayed)},
-        {"gamesWon", std::to_string(user->gamesWon)}
+        {"totalScore", ::std::to_string(user->totalScore)},
+        {"gamesPlayed", ::std::to_string(user->gamesPlayed)},
+        {"gamesWon", ::std::to_string(user->gamesWon)}
     });
 }
 
-std::string ApiController::handleLogout(const std::string& sessionId) {
+::std::string ApiController::handleLogout(const ::std::string& sessionId) {
     bool success = userService_.logoutUser(sessionId);
     return SimpleJson::object({
         {"success", success ? "true" : "false"}
     });
 }
 
-std::string ApiController::handleGetUser(const std::string& sessionId) {
+::std::string ApiController::handleGetUser(const ::std::string& sessionId) {
     auto user = userService_.getUserBySession(sessionId);
     
     if (!user) {
         return SimpleJson::object({
+            {"success", "false"},
             {"error", "User not found or session expired"}
         });
     }
     
     return SimpleJson::object({
-        {"userId", user->id},
-        {"username", user->username},
-        {"email", user->email},
-        {"totalScore", std::to_string(user->totalScore)},
-        {"gamesPlayed", std::to_string(user->gamesPlayed)},
-        {"gamesWon", std::to_string(user->gamesWon)},
-        {"winRate", std::to_string(user->gamesPlayed > 0 ? 
-            (static_cast<double>(user->gamesWon) / user->gamesPlayed * 100.0) : 0.0)}
+        {"success", "true"},
+        {"user", SimpleJson::object({
+            {"userId", user->id},
+            {"username", user->username},
+            {"email", user->email},
+            {"totalScore", ::std::to_string(user->totalScore)},
+            {"gamesPlayed", ::std::to_string(user->gamesPlayed)},
+            {"gamesWon", ::std::to_string(user->gamesWon)},
+            {"winRate", ::std::to_string(user->gamesPlayed > 0 ? 
+                (static_cast<double>(user->gamesWon) / user->gamesPlayed * 100.0) : 0.0)}
+        })}
     });
 }
 
-std::string ApiController::handleGetLeaderboard(int limit) {
+::std::string ApiController::handleGetLeaderboard(int limit) {
     auto entries = userService_.getLeaderboard(limit);
     
-    std::ostringstream oss;
+    ::std::ostringstream oss;
     oss << "[";
     for (size_t i = 0; i < entries.size(); ++i) {
         oss << "{";
@@ -420,7 +431,7 @@ std::string ApiController::handleGetLeaderboard(int limit) {
     return oss.str();
 }
 
-std::string ApiController::handleDeleteGame(const std::string& gameId) {
+::std::string ApiController::handleDeleteGame(const ::std::string& gameId) {
     service_.removeGame(gameId);
     return SimpleJson::object({
         {"status", "deleted"}

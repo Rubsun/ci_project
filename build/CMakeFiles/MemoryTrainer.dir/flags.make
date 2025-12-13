@@ -6,5 +6,5 @@ CXX_DEFINES =
 
 CXX_INCLUDES = -I/home/maksim/PycharmProjects/ci_project/include
 
-CXX_FLAGS =  -Wall -Wextra -O2 -std=c++17
+CXX_FLAGS =  -Wall -Wextra -O2 -fpermissive -std=c++17
 

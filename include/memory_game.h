@@ -25,7 +25,7 @@ struct GameResult {
     bool success;
     int score;
     int timeMs;
-    std::string message;
+    ::std::string message;
 };
 
 class MemoryGame {
@@ -35,9 +35,9 @@ public:
 
     virtual void generate() = 0;
     
-    virtual GameResult checkAnswer(const std::vector<int>& answer) = 0;
+    virtual GameResult checkAnswer(const ::std::vector<int>& answer) = 0;
     
-    virtual std::vector<int> getSequence() const = 0;
+    virtual ::std::vector<int> getSequence() const = 0;
     
     GameType getType() const { return type_; }
     Difficulty getDifficulty() const { return difficulty_; }
@@ -47,8 +47,8 @@ public:
 protected:
     GameType type_;
     Difficulty difficulty_;
-    std::vector<int> sequence_;
-    std::mt19937 rng_;
+    ::std::vector<int> sequence_;
+    ::std::mt19937 rng_;
     
     int getSequenceLength() const;
     int getNumberRange() const;
@@ -59,8 +59,8 @@ public:
     SequenceGame(Difficulty difficulty);
     
     void generate() override;
-    GameResult checkAnswer(const std::vector<int>& answer) override;
-    std::vector<int> getSequence() const override;
+    GameResult checkAnswer(const ::std::vector<int>& answer) override;
+    ::std::vector<int> getSequence() const override;
 };
 
 class PairsGame : public MemoryGame {
@@ -68,11 +68,13 @@ public:
     PairsGame(Difficulty difficulty);
     
     void generate() override;
-    GameResult checkAnswer(const std::vector<int>& answer) override;
-    std::vector<int> getSequence() const override;
+    GameResult checkAnswer(const ::std::vector<int>& answer) override;
+    ::std::vector<int> getSequence() const override;
     
-    std::vector<std::pair<int, int>> getPairs() const;
+    ::std::vector<::std::pair<int, int>> getPairs() const;
 
 private:
-    std::vector<std::pair<int, int>> pairs_;
+    ::std::vector<::std::pair<int, int>> pairs_;
 };
+
+} 

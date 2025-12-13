@@ -19,8 +19,8 @@ UserService::~UserService() {
     saveUsers();
 }
 
-std::string UserService::registerUser(const std::string& username, const std::string& email, const std::string& password) {
-    std::lock_guard<std::mutex> lock(usersMutex_);
+::std::string UserService::registerUser(const ::std::string& username, const ::std::string& email, const ::std::string& password) {
+    ::std::lock_guard<::std::mutex> lock(usersMutex_);
     
     for (const auto& [id, user] : users_) {
         if (user->username == username) {
@@ -31,10 +31,10 @@ std::string UserService::registerUser(const std::string& username, const std::st
         }
     }
     
-    std::string userId = generateUserId();
-    std::string passwordHash = hashPassword(password);
+    ::std::string userId = generateUserId();
+    ::std::string passwordHash = hashPassword(password);
     
-    auto user = std::make_shared<User>(username, email, passwordHash);
+    auto user = ::std::make_shared<User>(username, email, passwordHash);
     user->id = userId;
     
     users_[userId] = user;
@@ -43,15 +43,15 @@ std::string UserService::registerUser(const std::string& username, const std::st
     return userId;
 }
 
-std::string UserService::loginUser(const std::string& username, const std::string& password) {
-    std::lock_guard<std::mutex> lock(usersMutex_);
+::std::string UserService::loginUser(const ::std::string& username, const ::std::string& password) {
+    ::std::lock_guard<::std::mutex> lock(usersMutex_);
     
     for (const auto& [id, user] : users_) {
         if (user->username == username) {
             if (verifyPassword(password, user->passwordHash)) {
-                std::string sessionId = generateSessionId();
+                ::std::string sessionId = generateSessionId();
                 sessions_[sessionId] = user->id;
-                user->lastLogin = std::chrono::system_clock::now();
+                user->lastLogin = ::std::chrono::system_clock::now();
                 saveUsers();
                 return sessionId;
             }
@@ -62,28 +62,30 @@ std::string UserService::loginUser(const std::string& username, const std::strin
     return "";
 }
 
-bool UserService::logoutUser(const std::string& sessionId) {
-    std::lock_guard<std::mutex> lock(usersMutex_);
+bool UserService::logoutUser(const ::std::string& sessionId) {
+    ::std::lock_guard<::std::mutex> lock(usersMutex_);
     return sessions_.erase(sessionId) > 0;
 }
 
-std::shared_ptr<User> UserService::getUserById(const std::string& userId) {
-    std::lock_guard<std::mutex> lock(usersMutex_);
+::std::shared_ptr<User> UserService::getUserById(const ::std::string& userId) {
+    ::std::lock_guard<::std::mutex> lock(usersMutex_);
     auto it = users_.find(userId);
     return (it != users_.end()) ? it->second : nullptr;
 }
 
-std::shared_ptr<User> UserService::getUserBySession(const std::string& sessionId) {
-    std::lock_guard<std::mutex> lock(usersMutex_);
+::std::shared_ptr<User> UserService::getUserBySession(const ::std::string& sessionId) {
+    ::std::lock_guard<::std::mutex> lock(usersMutex_);
     auto it = sessions_.find(sessionId);
     if (it != sessions_.end()) {
-        return getUserById(it->second);
+        
+        auto userIt = users_.find(it->second);
+        return (userIt != users_.end()) ? userIt->second : nullptr;
     }
     return nullptr;
 }
 
-std::shared_ptr<User> UserService::getUserByUsername(const std::string& username) {
-    std::lock_guard<std::mutex> lock(usersMutex_);
+::std::shared_ptr<User> UserService::getUserByUsername(const ::std::string& username) {
+    ::std::lock_guard<::std::mutex> lock(usersMutex_);
     for (const auto& [id, user] : users_) {
         if (user->username == username) {
             return user;
@@ -92,10 +94,12 @@ std::shared_ptr<User> UserService::getUserByUsername(const std::string& username
     return nullptr;
 }
 
-void UserService::updateUserStats(const std::string& userId, int score, bool won) {
-    std::lock_guard<std::mutex> lock(usersMutex_);
-    auto user = getUserById(userId);
-    if (user) {
+void UserService::updateUserStats(const ::std::string& userId, int score, bool won) {
+    ::std::lock_guard<::std::mutex> lock(usersMutex_);
+    
+    auto userIt = users_.find(userId);
+    if (userIt != users_.end()) {
+        auto user = userIt->second;
         user->totalScore += score;
         user->gamesPlayed++;
         if (won) {
@@ -105,10 +109,10 @@ void UserService::updateUserStats(const std::string& userId, int score, bool won
     }
 }
 
-std::vector<LeaderboardEntry> UserService::getLeaderboard(int limit) {
-    std::lock_guard<std::mutex> lock(usersMutex_);
+::std::vector<LeaderboardEntry> UserService::getLeaderboard(int limit) {
+    ::std::lock_guard<::std::mutex> lock(usersMutex_);
     
-    std::vector<LeaderboardEntry> entries;
+    ::std::vector<LeaderboardEntry> entries;
     
     for (const auto& [id, user] : users_) {
         LeaderboardEntry entry;
@@ -121,7 +125,7 @@ std::vector<LeaderboardEntry> UserService::getLeaderboard(int limit) {
         entries.push_back(entry);
     }
 
-    std::sort(entries.begin(), entries.end(),
+    ::std::sort(entries.begin(), entries.end(),
         [](const LeaderboardEntry& a, const LeaderboardEntry& b) {
             return a.totalScore > b.totalScore;
         });
@@ -138,7 +142,7 @@ std::vector<LeaderboardEntry> UserService::getLeaderboard(int limit) {
 }
 
 void UserService::saveUsers() {
-    std::ofstream file(dataFile_, std::ios::binary);
+    ::std::ofstream file(dataFile_, ::std::ios::binary);
     if (!file.is_open()) return;
     
     for (const auto& [id, user] : users_) {
@@ -150,9 +154,9 @@ void UserService::saveUsers() {
         file << user->gamesPlayed << "\n";
         file << user->gamesWon << "\n";
         
-        auto time1 = std::chrono::duration_cast<std::chrono::seconds>(
+        auto time1 = ::std::chrono::duration_cast<::std::chrono::seconds>(
             user->createdAt.time_since_epoch()).count();
-        auto time2 = std::chrono::duration_cast<std::chrono::seconds>(
+        auto time2 = ::std::chrono::duration_cast<::std::chrono::seconds>(
             user->lastLogin.time_since_epoch()).count();
         file << time1 << "\n" << time2 << "\n";
         file << "---\n";
@@ -160,74 +164,74 @@ void UserService::saveUsers() {
 }
 
 void UserService::loadUsers() {
-    std::ifstream file(dataFile_);
+    ::std::ifstream file(dataFile_);
     if (!file.is_open()) return;
     
-    std::string line;
-    while (std::getline(file, line)) {
+    ::std::string line;
+    while (::std::getline(file, line)) {
         if (line == "---") continue;
         
-        auto user = std::make_shared<User>();
+        auto user = ::std::make_shared<User>();
         user->id = line;
         
-        std::getline(file, user->username);
-        std::getline(file, user->email);
-        std::getline(file, user->passwordHash);
+        ::std::getline(file, user->username);
+        ::std::getline(file, user->email);
+        ::std::getline(file, user->passwordHash);
         
-        std::getline(file, line);
-        user->totalScore = std::stoi(line);
+        ::std::getline(file, line);
+        user->totalScore = ::std::stoi(line);
         
-        std::getline(file, line);
-        user->gamesPlayed = std::stoi(line);
+        ::std::getline(file, line);
+        user->gamesPlayed = ::std::stoi(line);
         
-        std::getline(file, line);
-        user->gamesWon = std::stoi(line);
+        ::std::getline(file, line);
+        user->gamesWon = ::std::stoi(line);
         
-        std::getline(file, line);
-        int64_t createdAt = std::stoll(line);
-        user->createdAt = std::chrono::system_clock::time_point(
-            std::chrono::seconds(createdAt));
+        ::std::getline(file, line);
+        int64_t createdAt = ::std::stoll(line);
+        user->createdAt = ::std::chrono::system_clock::time_point(
+            ::std::chrono::seconds(createdAt));
         
-        std::getline(file, line);
-        int64_t lastLogin = std::stoll(line);
-        user->lastLogin = std::chrono::system_clock::time_point(
-            std::chrono::seconds(lastLogin));
+        ::std::getline(file, line);
+        int64_t lastLogin = ::std::stoll(line);
+        user->lastLogin = ::std::chrono::system_clock::time_point(
+            ::std::chrono::seconds(lastLogin));
         
         users_[user->id] = user;
         
-        std::getline(file, line);
+        ::std::getline(file, line);
     }
 }
 
-std::string UserService::generateUserId() {
-    static std::random_device rd;
-    static std::mt19937 gen(rd());
-    static std::uniform_int_distribution<> dis(100000, 999999);
+::std::string UserService::generateUserId() {
+    static ::std::random_device rd;
+    static ::std::mt19937 gen(rd());
+    static ::std::uniform_int_distribution<> dis(100000, 999999);
     
-    auto now = std::chrono::system_clock::now();
-    auto time = std::chrono::duration_cast<std::chrono::milliseconds>(
+    auto now = ::std::chrono::system_clock::now();
+    auto time = ::std::chrono::duration_cast<::std::chrono::milliseconds>(
         now.time_since_epoch()).count();
     
-    std::ostringstream oss;
+    ::std::ostringstream oss;
     oss << "user_" << time << "_" << dis(gen);
     return oss.str();
 }
 
-std::string UserService::generateSessionId() {
-    static std::random_device rd;
-    static std::mt19937 gen(rd());
-    static std::uniform_int_distribution<> dis(100000, 999999);
+::std::string UserService::generateSessionId() {
+    static ::std::random_device rd;
+    static ::std::mt19937 gen(rd());
+    static ::std::uniform_int_distribution<> dis(100000, 999999);
     
-    auto now = std::chrono::system_clock::now();
-    auto time = std::chrono::duration_cast<std::chrono::milliseconds>(
+    auto now = ::std::chrono::system_clock::now();
+    auto time = ::std::chrono::duration_cast<::std::chrono::milliseconds>(
         now.time_since_epoch()).count();
     
-    std::ostringstream oss;
+    ::std::ostringstream oss;
     oss << "session_" << time << "_" << dis(gen);
     return oss.str();
 }
 
-std::string UserService::hashPassword(const std::string& password) {
+::std::string UserService::hashPassword(const ::std::string& password) {
     EVP_MD_CTX* mdctx = EVP_MD_CTX_new();
     const EVP_MD* md = EVP_sha256();
     unsigned char hash[EVP_MAX_MD_SIZE];
@@ -238,14 +242,14 @@ std::string UserService::hashPassword(const std::string& password) {
     EVP_DigestFinal_ex(mdctx, hash, &hashLen);
     EVP_MD_CTX_free(mdctx);
     
-    std::ostringstream oss;
+    ::std::ostringstream oss;
     for (unsigned int i = 0; i < hashLen; ++i) {
-        oss << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(hash[i]);
+        oss << ::std::hex << ::std::setw(2) << ::std::setfill('0') << static_cast<int>(hash[i]);
     }
     return oss.str();
 }
 
-bool UserService::verifyPassword(const std::string& password, const std::string& hash) {
+bool UserService::verifyPassword(const ::std::string& password, const ::std::string& hash) {
     return hashPassword(password) == hash;
 }
 

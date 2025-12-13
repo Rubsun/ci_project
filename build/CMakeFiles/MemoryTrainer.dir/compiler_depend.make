@@ -917,6 +917,7 @@ CMakeFiles/MemoryTrainer.dir/src/main.cpp.o: /home/maksim/PycharmProjects/ci_pro
   /usr/include/x86_64-linux-gnu/sys/select.h \
   /usr/include/x86_64-linux-gnu/sys/single_threaded.h \
   /usr/include/x86_64-linux-gnu/sys/socket.h \
+  /usr/include/x86_64-linux-gnu/sys/time.h \
   /usr/include/x86_64-linux-gnu/sys/types.h \
   /usr/lib/gcc/x86_64-linux-gnu/13/include/stdarg.h \
   /usr/lib/gcc/x86_64-linux-gnu/13/include/stddef.h \
@@ -1833,6 +1834,8 @@ CMakeFiles/MemoryTrainer.dir/src/user_service.cpp.o: /home/maksim/PycharmProject
 /home/maksim/PycharmProjects/ci_project/src/memory_service.cpp:
 
 /home/maksim/PycharmProjects/ci_project/src/memory_game.cpp:
+
+/usr/include/x86_64-linux-gnu/sys/time.h:
 
 /usr/include/x86_64-linux-gnu/bits/unistd_ext.h:
 
