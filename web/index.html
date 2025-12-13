@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тренировка Памяти - Игра на Память</title>
+    <link rel="stylesheet" href="/web/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🧠 Тренировка Памяти</h1>
+            <p class="subtitle">Развивайте свою память с помощью увлекательных игр</p>
+        </header>
+
+        <div class="game-setup" id="gameSetup">
+            <h2>Выберите игру</h2>
+            <div class="game-options">
+                <div class="option-group">
+                    <label>Тип игры:</label>
+                    <select id="gameType">
+                        <option value="sequence">Последовательность</option>
+                        <option value="cards" selected>Карточки (Пары)</option>
+                    </select>
+                </div>
+                <div class="option-group">
+                    <label>Сложность:</label>
+                    <select id="difficulty">
+                        <option value="easy">Легкая (4 пары)</option>
+                        <option value="medium" selected>Средняя (6 пар)</option>
+                        <option value="hard">Сложная (8 пар)</option>
+                    </select>
+                </div>
+            </div>
+            <button class="btn btn-primary" id="startGameBtn">Начать игру</button>
+        </div>
+
+        <div class="game-area" id="gameArea" style="display: none;">
+            <div class="game-info">
+                <div class="info-item">
+                    <span class="label">Очки:</span>
+                    <span id="score">0</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">Ходы:</span>
+                    <span id="moves">0</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">Пары:</span>
+                    <span id="pairsFound">0</span>
+                </div>
+            </div>
+
+            <!-- Для игры в последовательность -->
+            <div class="sequence-game" id="sequenceGame" style="display: none;">
+                <div class="memorization-phase" id="memorizationPhase">
+                    <h3>Запомните последовательность:</h3>
+                    <div class="sequence-display" id="sequenceDisplay"></div>
+                    <div class="timer-display" id="memorizationTimer"></div>
+                </div>
+                <div class="answer-phase" id="answerPhase" style="display: none;">
+                    <h3>Введите последовательность:</h3>
+                    <div class="answer-input" id="answerInput"></div>
+                    <div class="button-group">
+                        <button class="btn btn-primary" id="checkAnswerBtn">Проверить</button>
+                        <button class="btn btn-secondary" id="resetGameBtn">Новая игра</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Для карточной игры -->
+            <div class="cards-game" id="cardsGame" style="display: none;">
+                <div class="cards-grid" id="cardsGrid"></div>
+                <div class="button-group">
+                    <button class="btn btn-secondary" id="resetGameBtn2">Новая игра</button>
+                </div>
+            </div>
+
+            <div class="result-message" id="resultMessage"></div>
+        </div>
+    </div>
+
+    <script src="/web/app.js"></script>
+</body>
+</html>

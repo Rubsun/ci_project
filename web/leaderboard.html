@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Таблица Лидеров - Memory Trainer</title>
+    <link rel="stylesheet" href="/web/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <h1 class="nav-logo">🧠 Memory Trainer</h1>
+            <div class="nav-links">
+                <a href="/" class="nav-link">Игры</a>
+                <a href="/web/leaderboard.html" class="nav-link active">Таблица лидеров</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h2>🏆 Таблица Лидеров</h2>
+        <div class="leaderboard" id="leaderboard">
+            <div class="loading">Загрузка...</div>
+        </div>
+    </div>
+
+    <script>
+        async function loadLeaderboard() {
+            try {
+                const response = await fetch('/api/leaderboard?limit=20');
+                const data = await response.json();
+                
+                const leaderboard = document.getElementById('leaderboard');
+                leaderboard.innerHTML = '';
+                
+                if (!data.leaderboard || data.leaderboard.length === 0) {
+                    leaderboard.innerHTML = '<p>Пока нет результатов</p>';
+                    return;
+                }
+                
+                const table = document.createElement('table');
+                table.className = 'leaderboard-table';
+                
+                const header = document.createElement('tr');
+                header.innerHTML = '<th>Место</th><th>Игрок</th><th>Очки</th><th>Побед</th><th>% Побед</th>';
+                table.appendChild(header);
+                
+                data.leaderboard.forEach(entry => {
+                    const row = document.createElement('tr');
+                    if (entry.rank === 1) row.classList.add('gold');
+                    else if (entry.rank === 2) row.classList.add('silver');
+                    else if (entry.rank === 3) row.classList.add('bronze');
+                    
+                    row.innerHTML = `
+                        <td>${entry.rank}</td>
+                        <td>${entry.username}</td>
+                        <td>${entry.totalScore}</td>
+                        <td>${entry.gamesWon}</td>
+                        <td>${entry.winRate.toFixed(1)}%</td>
+                    `;
+                    table.appendChild(row);
+                });
+                
+                leaderboard.appendChild(table);
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('leaderboard').innerHTML = '<p>Ошибка загрузки таблицы лидеров</p>';
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', loadLeaderboard);
+    </script>
+</body>
+</html>
+
+

@@ -1,0 +1,3 @@
+/home/maksim/PycharmProjects/ci_project/build/CMakeFiles/MemoryTrainer.dir
+/home/maksim/PycharmProjects/ci_project/build/CMakeFiles/edit_cache.dir
+/home/maksim/PycharmProjects/ci_project/build/CMakeFiles/rebuild_cache.dir
