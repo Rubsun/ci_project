@@ -282,9 +282,7 @@ ApiController::ApiController(MemoryService& service, UserService& userService)
     
     bool isPair = cardGame->checkPair(cardId1, cardId2);
     
-    if (!isPair) {
-        cardGame->resetFlippedCards();
-    }
+    cardGame->resetFlippedCards();
 
     auto cards = cardGame->getCards();
     ::std::ostringstream cardsJson;
